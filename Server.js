@@ -1,3 +1,25 @@
+const express = require('express');
+const ConnectDB = require('./Config/ConnectDB');
+const userRouter = require('./Routes/UserRoutes');
+const taskRouter = require('./Routes/TaskRoutes');
+const cronRouter = require('./Routes/CronRoutes');
+const Task = require('./Models/Task');
+const User = require('./Models/User'); // Import the User model
+const transporter = require('./Config/EmailTransporter'); // Import nodemailer transporter
+const cors = require('cors');
+const cron = require('node-cron');
+
+require('dotenv').config();
+
+const app = express();
+
+app.use(cors({
+    origin: '*', // Allow all origins (for testing only)
+    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Include methods your app supports
+    credentials: true // If you're using cookies or authentication
+}));
+
+// Schedule cron job to run every minute for testing purposes
 cron.schedule('* * * * *', async () => { // Runs every minute for testing
     const today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
     console.log('Cron job started at:', new Date()); // Log when the cron job starts
@@ -56,4 +78,15 @@ Stay ahead team
     } catch (error) {
         console.error('Error fetching tasks with deadlines:', error); // Log any error that occurs
     }
+});
+
+app.use(express.json());
+ConnectDB();
+
+app.use('/api/users', userRouter);
+app.use('/api/tasks', taskRouter);
+app.use('/api/cron', cronRouter);
+
+app.listen(process.env.PORT, () => {
+    console.log(`Server is running on port ${process.env.PORT}`);
 });
