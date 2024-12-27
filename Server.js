@@ -5,8 +5,16 @@ const taskRouter = require('./Routes/TaskRoutes');
 const Task = require('./Models/Task');
 const User = require('./Models/User'); // Import the User model
 const transporter = require('./Config/EmailTransporter'); // Import nodemailer transporter
+const cors = require('cors');
+
 
 const app = express();
+
+app.use(cors({
+    origin: '*', // Allow all origins (for testing only)
+    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Include methods your app supports
+    credentials: true // If you're using cookies or authentication
+  }));
 
 // Schedule cron job to run every day at 8 AM
 const cron = require('node-cron');
