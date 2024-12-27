@@ -20,7 +20,7 @@ app.use(cors({
 // Schedule cron job to run every day at 8 AM
 const cron = require('node-cron');
 
-cron.schedule('20 23 * * *', async () => {
+cron.schedule('45 23 * * *', async () => {
     const today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
 
     try {
