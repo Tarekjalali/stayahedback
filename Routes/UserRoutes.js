@@ -66,11 +66,12 @@ userRouter.get('/activate/:code', async (req, res) => {
   try {
     const { code } = req.params;
 
+   
     // Find the user by activationCode
     const user = await User.findOne({ activationCode: code });
 
     if (!user) {
-      return res.status(400).send({ msg: 'Invalid or expired activation code.' });
+      return res.status(400).send({ errors: [{ msg: 'Invalid or expired activation code.' }] });  
     }
 
     // Activate the account

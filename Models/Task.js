@@ -4,21 +4,20 @@ const taskSchema = new mongoose.Schema({
   title: {
     type: String,
     required: true,
-      },
+  },
   deadline: {
     type: Date,
-    required: true, 
+    required: true,
   },
   isDone: {
     type: Boolean,
-    default: false, 
+    default: false,
   },
   owner: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User', 
-    required: true, 
+    ref: 'UserModel', // Change this to 'UserModel'
+    required: true,
   },
 });
-
 
 module.exports = mongoose.model('Task', taskSchema);
