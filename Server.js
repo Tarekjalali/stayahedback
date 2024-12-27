@@ -1,32 +1,10 @@
-const express = require('express');
-const ConnectDB = require('./Config/ConnectDB');
-const userRouter = require('./Routes/UserRoutes');
-const taskRouter = require('./Routes/TaskRoutes');
-const cronRouter = require('./Routes/CronRoutes');
-const Task = require('./Models/Task');
-const User = require('./Models/User'); // Import the User model
-const transporter = require('./Config/EmailTransporter'); // Import nodemailer transporter
-const cors = require('cors');
-const cron = require('node-cron');
-
-require('dotenv').config();
-
-const app = express();
-
-app.use(cors({
-    origin: '*', // Allow all origins (for testing only)
-    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Include methods your app supports
-    credentials: true // If you're using cookies or authentication
-}));
-
-// Schedule cron job to run every minute for testing purposes
-cron.schedule('* * * * *', async () => { // This will run every minute
+cron.schedule('* * * * *', async () => { // Runs every minute for testing
     const today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
     console.log('Cron job started at:', new Date()); // Log when the cron job starts
 
     try {
         const tasksDueToday = await Task.find({ deadline: today }).populate('owner'); // Populate the owner field with user data
-        console.log(`Found ${tasksDueToday.length} tasks due today`); // Log the number of tasks
+        console.log('Tasks due today:', tasksDueToday); // Log the tasks due today
 
         if (tasksDueToday.length > 0) {
             // Create a map to store tasks by user email
@@ -47,11 +25,9 @@ cron.schedule('* * * * *', async () => { // This will run every minute
 
             // Now loop through each user and send an email
             for (const [userEmail, taskList] of Object.entries(userTasksMap)) {
-                const user = tasksDueToday.find(task => task.owner.email === userEmail).owner;
-
                 // Prepare the email content
                 const emailContent = `
-Hello ${user.name},
+Hello,
 
 Your tasks for today are:
 
@@ -80,15 +56,4 @@ Stay ahead team
     } catch (error) {
         console.error('Error fetching tasks with deadlines:', error); // Log any error that occurs
     }
-});
-
-app.use(express.json());
-ConnectDB();
-
-app.use('/api/users', userRouter);
-app.use('/api/tasks', taskRouter);
-app.use('/api/cron', cronRouter);
-
-app.listen(process.env.PORT, () => {
-    console.log(`Server is running on port ${process.env.PORT}`);
 });
