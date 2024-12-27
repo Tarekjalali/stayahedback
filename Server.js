@@ -2,6 +2,7 @@ const express = require('express');
 const ConnectDB = require('./Config/ConnectDB');
 const userRouter = require('./Routes/UserRoutes');
 const taskRouter = require('./Routes/TaskRoutes');
+const cronRouter = require('./Routes/CronRoutes');
 const Task = require('./Models/Task');
 const User = require('./Models/User'); // Import the User model
 const transporter = require('./Config/EmailTransporter'); // Import nodemailer transporter
@@ -19,7 +20,7 @@ app.use(cors({
 // Schedule cron job to run every day at 8 AM
 const cron = require('node-cron');
 
-cron.schedule('20 17 * * *', async () => {
+cron.schedule('10 23 * * *', async () => {
     const today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
 
     try {
@@ -71,5 +72,6 @@ ConnectDB();
 
 app.use('/api/users', userRouter);
 app.use('/api/tasks', taskRouter);
+app.use('/api/cron', cronRouter);
 
 app.listen(process.env.port, console.log(`Server is running on port ${process.env.port}`));
