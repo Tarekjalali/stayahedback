@@ -20,7 +20,7 @@ app.use(cors({
 }));
 
 // Schedule cron job to run every minute for testing purposes
-cron.schedule('05 14 * * *', async () => { // Runs every minute for testing
+cron.schedule('52 14 * * *', async () => { // Runs every minute for testing
     const today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
     console.log(`Cron job started at: ${new Date()}`); // Log when the cron job starts
 
@@ -34,14 +34,15 @@ cron.schedule('05 14 * * *', async () => { // Runs every minute for testing
 
             // Loop through each task and organize them by user
             tasksDueToday.forEach(task => {
-                const userEmail = task.owner.email;
-
-                // If the user is not in the map, initialize an empty array for them
+                if (!task.Taskowner || !task.Taskowner.email) {
+                    console.error(`Task "${task.title}" is missing Taskowner or email.`);
+                    return;
+                }
+            
+                const userEmail = task.Taskowner.email;
                 if (!userTasksMap[userEmail]) {
                     userTasksMap[userEmail] = [];
                 }
-
-                // Add the task to the user's task list
                 userTasksMap[userEmail].push(`- ${task.title}`);
             });
 
