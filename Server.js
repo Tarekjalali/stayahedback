@@ -20,7 +20,7 @@ app.use(cors({
 }));
 
 // Schedule cron job to run every minute for testing purposes
-cron.schedule('58 20 * * *', async () => { // Runs every minute for testing
+cron.schedule('1 21 * * *', async () => { // Runs every minute for testing
     const today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
     console.log(`Cron job started at: ${new Date()}`); // Log when the cron job starts
 
