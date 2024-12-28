@@ -119,7 +119,7 @@ userRouter.delete('/deleteAccount/:id', async (req, res) => {
     const { id } = req.params;
 
     // Delete all tasks associated with the user
-    await Task.deleteMany({ owner: id });
+    await Task.deleteMany({ Taskowner: id });
 
     // Delete the user
     const user = await User.findByIdAndDelete(id);
