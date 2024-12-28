@@ -23,7 +23,7 @@ taskRouter.get('/getmyTasks/:id', async (req, res) => {
     try {
         const { id } = req.params
         // Find tasks where the owner is the given user ID
-        const tasks = await Task.find({ owner: id })
+        const tasks = await Task.find({ Taskowner: id })
 
         res.status(200).send({ msg: "My tasks", tasks })
     } catch (error) {
