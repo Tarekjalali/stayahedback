@@ -13,7 +13,7 @@ CronRouter.get('/check-deadlines', async (req, res) => {
 
         if (tasksDueToday.length > 0) {
             const taskList = tasksDueToday.map(task => `- ${task.title}`).join('\n');
-            const userEmail = tasksDueToday[0].owner.email; 
+            const userEmail = tasksDueToday[0].Taskowner.email; 
 
             const emailContent = `
 Hello ${tasksDueToday[0].Taskowner.name},
