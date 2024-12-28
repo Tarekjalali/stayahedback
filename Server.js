@@ -20,12 +20,12 @@ app.use(cors({
 }));
 
 // Schedule cron job to run every minute for testing purposes
-cron.schedule('52 1 * * *', async () => { // Runs every minute for testing
+cron.schedule('03 2 * * *', async () => { // Runs every minute for testing
     const today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
     console.log(`Cron job started at: ${new Date()}`); // Log when the cron job starts
 
     try {
-        const tasksDueToday = await Task.find({ deadline: today }).populate('owner'); // Populate the owner field with user data
+        const tasksDueToday = await Task.find({ deadline: today }).populate('Taskowner'); // Populate the owner field with user data
         console.log(`Tasks due today:`, tasksDueToday); // Log the tasks due today
 
         if (tasksDueToday.length > 0) {

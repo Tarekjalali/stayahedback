@@ -13,7 +13,7 @@ const taskSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
-  owner: {
+  Taskowner: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'UserModel', // Change this to 'UserModel'
     required: true,
