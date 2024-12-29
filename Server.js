@@ -19,37 +19,43 @@ app.use(cors({
     credentials: true // If you're using cookies or authentication
 }));
 
-// Schedule cron job to run every minute for testing purposes
-cron.schedule('* * * * *', async () => { // Runs every minute for testing
-    const today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
-    console.log(`Cron job started at: ${new Date()}`); // Log when the cron job starts
+// Schedule cron job to run every minute
+cron.schedule('* * * * *', async () => { 
+    const now = new Date();
+    const currentHour = now.getHours();
+    const currentMinute = now.getMinutes();
 
-    try {
-        const tasksDueToday = await Task.find({ deadline: today }).populate('Taskowner'); // Populate the owner field with user data
-        console.log(`Tasks due today:`, tasksDueToday); // Log the tasks due today
+    // Check if the current time is 11:50 AM
+    if (currentHour === 11 && currentMinute === 50) {
+        console.log(`Cron job started at 11:50 AM: ${now}`); // Log when the cron job starts
 
-        if (tasksDueToday.length > 0) {
-            // Create a map to store tasks by user email
-            const userTasksMap = {};
+        try {
+            const today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
+            const tasksDueToday = await Task.find({ deadline: today }).populate('Taskowner'); // Populate the owner field with user data
+            console.log(`Tasks due today:`, tasksDueToday); // Log the tasks due today
 
-            // Loop through each task and organize them by user
-            tasksDueToday.forEach(task => {
-                if (!task.Taskowner || !task.Taskowner.email) {
-                    console.error(`Task "${task.title}" is missing Taskowner or email.`);
-                    return;
-                }
-            
-                const userEmail = task.Taskowner.email;
-                if (!userTasksMap[userEmail]) {
-                    userTasksMap[userEmail] = [];
-                }
-                userTasksMap[userEmail].push(`- ${task.title}`);
-            });
+            if (tasksDueToday.length > 0) {
+                // Create a map to store tasks by user email
+                const userTasksMap = {};
 
-            // Now loop through each user and send an email
-            for (const [userEmail, taskList] of Object.entries(userTasksMap)) {
-                // Prepare the email content
-                const emailContent = `
+                // Loop through each task and organize them by user
+                tasksDueToday.forEach(task => {
+                    if (!task.Taskowner || !task.Taskowner.email) {
+                        console.error(`Task "${task.title}" is missing Taskowner or email.`);
+                        return;
+                    }
+
+                    const userEmail = task.Taskowner.email;
+                    if (!userTasksMap[userEmail]) {
+                        userTasksMap[userEmail] = [];
+                    }
+                    userTasksMap[userEmail].push(`- ${task.title}`);
+                });
+
+                // Now loop through each user and send an email
+                for (const [userEmail, taskList] of Object.entries(userTasksMap)) {
+                    // Prepare the email content
+                    const emailContent = `
 Hello,
 
 Your tasks for today are:
@@ -60,24 +66,28 @@ Remember, every task completed brings you closer to your goals. Keep up the grea
 
 Best regards,
 Stay ahead team
-                `;
+                    `;
 
-                // Send the email
-                const mailOptions = {
-                    from: process.env.EMAIL_USER,
-                    to: userEmail,
-                    subject: 'Your Tasks for Today',
-                    text: emailContent,
-                };
+                    // Send the email
+                    const mailOptions = {
+                        from: process.env.EMAIL_USER,
+                        to: userEmail,
+                        subject: 'Your Tasks for Today',
+                        text: emailContent,
+                    };
 
-                await transporter.sendMail(mailOptions);
-                console.log(`Email sent successfully to ${userEmail}`); // Log successful email sending
+                    await transporter.sendMail(mailOptions);
+                    console.log(`Email sent successfully to ${userEmail}`); // Log successful email sending
+                }
+            } else {
+                console.log('No tasks due today'); // Log if no tasks are due
             }
-        } else {
-            console.log('No tasks due today'); // Log if no tasks are due
+        } catch (error) {
+            console.error(`Error fetching tasks with deadlines:`, error); // Log any error that occurs
         }
-    } catch (error) {
-        console.error(`Error fetching tasks with deadlines:`, error); // Log any error that occurs
+    } else {
+        // Skip running the task
+        console.log(`Cron job skipped at: ${now}`);
     }
 });
 
