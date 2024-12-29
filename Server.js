@@ -4,8 +4,8 @@ const userRouter = require('./Routes/UserRoutes');
 const taskRouter = require('./Routes/TaskRoutes');
 const cronRouter = require('./Routes/CronRoutes');
 const Task = require('./Models/Task');
-const User = require('./Models/User'); // Import the User model
-const transporter = require('./Config/EmailTransporter'); // Import nodemailer transporter
+const User = require('./Models/User'); 
+const transporter = require('./Config/EmailTransporter'); 
 const cors = require('cors');
 const cron = require('node-cron');
 
@@ -14,19 +14,19 @@ require('dotenv').config();
 const app = express();
 
 app.use(cors({
-    origin: '*', // Allow all origins (for testing only)
-    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Include methods your app supports
-    credentials: true // If you're using cookies or authentication
+    origin: '*', 
+    methods: ['GET', 'POST', 'PUT', 'DELETE'], 
+    credentials: true 
 }));
 
-cron.schedule('20 20 * * *', async () => { // Runs every day at 12:00 PM
-    console.log(`Cron job started at: ${new Date()}`); // Log when the cron job starts
+cron.schedule('20 20 * * *', async () => { 
+    console.log(`Cron job started at: ${new Date()}`); 
 
-    const today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
+    const today = new Date().toISOString().split('T')[0]; 
 
     try {
-        const tasksDueToday = await Task.find({ deadline: today }).populate('Taskowner'); // Populate the owner field with user data
-        console.log(`Tasks due today:`, tasksDueToday); // Log the tasks due today
+        const tasksDueToday = await Task.find({ deadline: today }).populate('Taskowner'); 
+        console.log(`Tasks due today:`, tasksDueToday); 
 
         if (tasksDueToday.length > 0) {
             const userTasksMap = {};
