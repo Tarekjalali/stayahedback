@@ -19,43 +19,33 @@ app.use(cors({
     credentials: true // If you're using cookies or authentication
 }));
 
-// Schedule cron job to run every minute
-cron.schedule('* * * * *', async () => { 
-    const now = new Date();
-    const currentHour = now.getHours();
-    const currentMinute = now.getMinutes();
+cron.schedule('0 12 * * *', async () => { // Runs every day at 12:00 PM
+    console.log(`Cron job started at: ${new Date()}`); // Log when the cron job starts
 
-    // Check if the current time is 11:50 AM
-    if (currentHour === 11 && currentMinute === 45) {
-        console.log(`Cron job started at 11:50 AM: ${now}`); // Log when the cron job starts
+    const today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
 
-        try {
-            const today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
-            const tasksDueToday = await Task.find({ deadline: today }).populate('Taskowner'); // Populate the owner field with user data
-            console.log(`Tasks due today:`, tasksDueToday); // Log the tasks due today
+    try {
+        const tasksDueToday = await Task.find({ deadline: today }).populate('Taskowner'); // Populate the owner field with user data
+        console.log(`Tasks due today:`, tasksDueToday); // Log the tasks due today
 
-            if (tasksDueToday.length > 0) {
-                // Create a map to store tasks by user email
-                const userTasksMap = {};
+        if (tasksDueToday.length > 0) {
+            const userTasksMap = {};
 
-                // Loop through each task and organize them by user
-                tasksDueToday.forEach(task => {
-                    if (!task.Taskowner || !task.Taskowner.email) {
-                        console.error(`Task "${task.title}" is missing Taskowner or email.`);
-                        return;
-                    }
+            tasksDueToday.forEach(task => {
+                if (!task.Taskowner || !task.Taskowner.email) {
+                    console.error(`Task "${task.title}" is missing Taskowner or email.`);
+                    return;
+                }
 
-                    const userEmail = task.Taskowner.email;
-                    if (!userTasksMap[userEmail]) {
-                        userTasksMap[userEmail] = [];
-                    }
-                    userTasksMap[userEmail].push(`- ${task.title}`);
-                });
+                const userEmail = task.Taskowner.email;
+                if (!userTasksMap[userEmail]) {
+                    userTasksMap[userEmail] = [];
+                }
+                userTasksMap[userEmail].push(`- ${task.title}`);
+            });
 
-                // Now loop through each user and send an email
-                for (const [userEmail, taskList] of Object.entries(userTasksMap)) {
-                    // Prepare the email content
-                    const emailContent = `
+            for (const [userEmail, taskList] of Object.entries(userTasksMap)) {
+                const emailContent = `
 Hello,
 
 Your tasks for today are:
@@ -66,30 +56,26 @@ Remember, every task completed brings you closer to your goals. Keep up the grea
 
 Best regards,
 Stay ahead team
-                    `;
+                `;
 
-                    // Send the email
-                    const mailOptions = {
-                        from: process.env.EMAIL_USER,
-                        to: userEmail,
-                        subject: 'Your Tasks for Today',
-                        text: emailContent,
-                    };
+                const mailOptions = {
+                    from: process.env.EMAIL_USER,
+                    to: userEmail,
+                    subject: 'Your Tasks for Today',
+                    text: emailContent,
+                };
 
-                    await transporter.sendMail(mailOptions);
-                    console.log(`Email sent successfully to ${userEmail}`); // Log successful email sending
-                }
-            } else {
-                console.log('No tasks due today'); // Log if no tasks are due
+                await transporter.sendMail(mailOptions);
+                console.log(`Email sent successfully to ${userEmail}`);
             }
-        } catch (error) {
-            console.error(`Error fetching tasks with deadlines:`, error); // Log any error that occurs
+        } else {
+            console.log('No tasks due today');
         }
-    } else {
-        // Skip running the task
-        console.log(`Cron job skipped at: ${now}`);
+    } catch (error) {
+        console.error(`Error fetching tasks with deadlines:`, error);
     }
 });
+
 
 app.use(express.json());
 ConnectDB();
