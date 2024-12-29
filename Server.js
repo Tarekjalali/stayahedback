@@ -1,3 +1,25 @@
+const express = require('express');
+const ConnectDB = require('./Config/ConnectDB');
+const userRouter = require('./Routes/UserRoutes');
+const taskRouter = require('./Routes/TaskRoutes');
+const cronRouter = require('./Routes/CronRoutes');
+const Task = require('./Models/Task');
+const User = require('./Models/User'); // Import the User model
+const transporter = require('./Config/EmailTransporter'); // Import nodemailer transporter
+const cors = require('cors');
+const cron = require('node-cron');
+
+require('dotenv').config();
+
+const app = express();
+
+app.use(cors({
+    origin: '*', // Allow all origins (for testing only)
+    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Include methods your app supports
+    credentials: true // If you're using cookies or authentication
+}));
+
+// Schedule cron job to run every minute
 cron.schedule('* * * * *', async () => { 
     const now = new Date();
     const currentHour = now.getHours();
@@ -65,4 +87,16 @@ Stay ahead team
         }
     } 
     // Do nothing else; no logging for skipped times
+});
+
+
+app.use(express.json());
+ConnectDB();
+
+app.use('/api/users', userRouter);
+app.use('/api/tasks', taskRouter);
+app.use('/api/cron', cronRouter);
+
+app.listen(process.env.PORT, () => {
+    console.log(`Server is running on port ${process.env.PORT}`);
 });
