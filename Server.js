@@ -26,7 +26,7 @@ cron.schedule('* * * * *', async () => {
     const currentMinute = now.getMinutes();
 
     // Check if the current time is 11:50 AM
-    if (currentHour === 12 && currentMinute === 30) {
+    if (currentHour === 11 && currentMinute === 45) {
         console.log(`Cron job started at 11:50 AM: ${now}`); // Log when the cron job starts
 
         try {
