@@ -26,7 +26,7 @@ cron.schedule('* * * * *', async () => {
     const currentMinute = now.getMinutes();
 
     // Check if the current time is 11:50 AM
-    if (currentHour === 11 && currentMinute === 59) {
+    if (currentHour === 12 && currentMinute === 30) {
         console.log(`Cron job started at 11:50 AM: ${now}`); // Log when the cron job starts
 
         try {
@@ -85,10 +85,11 @@ Stay ahead team
         } catch (error) {
             console.error(`Error fetching tasks with deadlines:`, error); // Log any error that occurs
         }
-    } 
-    // Do nothing else; no logging for skipped times
+    } else {
+        // Skip running the task
+        console.log(`Cron job skipped at: ${now}`);
+    }
 });
-
 
 app.use(express.json());
 ConnectDB();
