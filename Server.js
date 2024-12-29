@@ -19,7 +19,7 @@ app.use(cors({
     credentials: true // If you're using cookies or authentication
 }));
 
-cron.schedule('55 12 * * *', async () => { // Runs every day at 12:00 PM
+cron.schedule('1 13 * * *', async () => { // Runs every day at 12:00 PM
     console.log(`Cron job started at: ${new Date()}`); // Log when the cron job starts
 
     const today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
