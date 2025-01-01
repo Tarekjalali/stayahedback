@@ -46,7 +46,7 @@ cron.schedule('15 16 * * *', async () => {
 
             for (const [userEmail, taskList] of Object.entries(userTasksMap)) {
                 const emailContent = `
-Hello,
+Hello ${Taskowner.name},
 
 Your tasks for today are:
 
