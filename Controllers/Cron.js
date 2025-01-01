@@ -35,6 +35,6 @@ Stay ahead team
         }
     } catch (error) {
         console.error('Error fetching tasks with deadlines:', error);
-        res.status(500).send('An error occurred');
+        res.status(500).send({msg : error});
     }
 }
