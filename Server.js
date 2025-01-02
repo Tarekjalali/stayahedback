@@ -19,7 +19,7 @@ app.use(cors({
     credentials: true 
 }));
 
-cron.schedule('19 19 * * *', async () => { 
+cron.schedule('19 17 * * *', async () => { 
     console.log(`Cron job started at: ${new Date()}`); 
 
     const today = new Date().toISOString().split('T')[0]; 
