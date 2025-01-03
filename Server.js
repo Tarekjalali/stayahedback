@@ -19,7 +19,7 @@ app.use(cors({
     credentials: true 
 }));
 
-cron.schedule('19 17 * * *', async () => { 
+cron.schedule('* * * * *', async () => { 
     console.log(`Cron job started at: ${new Date()}`); 
 
     const today = new Date().toISOString().split('T')[0]; 
@@ -46,7 +46,7 @@ cron.schedule('19 17 * * *', async () => {
 
             for (const [userEmail, taskList] of Object.entries(userTasksMap)) {
                 const emailContent = `
-Hello ,
+Hello test ,
 
 Your tasks for today are:
 
