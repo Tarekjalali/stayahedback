@@ -38,19 +38,21 @@ cron.schedule('* * * * *', async () => {
                 }
 
                 const userEmail = task.Taskowner.email;
+                const userName = task.Taskowner.name || 'User'; // Default to 'User' if name is missing
+                
                 if (!userTasksMap[userEmail]) {
-                    userTasksMap[userEmail] = [];
+                    userTasksMap[userEmail] = { name: userName, tasks: [] };
                 }
-                userTasksMap[userEmail].push(`- ${task.title}`);
+                userTasksMap[userEmail].tasks.push(`- ${task.title}`);
             });
 
-            for (const [userEmail, taskList] of Object.entries(userTasksMap)) {
+            for (const [userEmail, { name, tasks }] of Object.entries(userTasksMap)) {
                 const emailContent = `
-Hello test ,
+Hello ${name},
 
 Your tasks for today are:
 
-${taskList.join('\n')}
+${tasks.join('\n')}
 
 Remember, every task completed brings you closer to your goals. Keep up the great work!
 
@@ -75,7 +77,6 @@ Stay ahead team
         console.error(`Error fetching tasks with deadlines:`, error);
     }
 });
-
 
 app.use(express.json());
 ConnectDB();
