@@ -1,15 +1,14 @@
 const express = require('express')
 
-const { createTask, getMyTasks, deleteTask, updateTask, createEncryptedTask, getMyTasksDecrypted } = require('../Controllers/Tasks')
+const { deleteTask, updateTask, createEncryptedTask, getMyTasksDecrypted } = require('../Controllers/Tasks')
 
 const taskRouter = express.Router()
 
 
-taskRouter.post('/createTask' , createTask)
+
 
 taskRouter.post('/createEncryptedTask' , createEncryptedTask)
 
-taskRouter.get('/getmyTasks/:id', getMyTasks)
 
 taskRouter.get('/getmyTasksDecrypted/:id', getMyTasksDecrypted)
 

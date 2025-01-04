@@ -2,8 +2,8 @@ const mongoose = require('mongoose');
 
 const taskSchema = new mongoose.Schema({
   title: {
-    encryptedData: { type: String, required: true }, // Encrypted title
-    iv: { type: String, required: true },           // Initialization vector
+    encryptedData: { type: String, required: true }, 
+    iv: { type: String, required: true },          
   },
   deadline: {
     type: Date,
