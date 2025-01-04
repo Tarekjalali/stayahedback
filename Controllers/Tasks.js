@@ -28,19 +28,48 @@ exports.getMyTasks = async (req, res) => {
     }
 }
 
-exports.updateTask = async(req,res)=>{
-
+exports.updateTask = async (req, res) => {
     try {
-
-        const {id} = req.params
-        await Task.findByIdAndUpdate(id, req.body)
-        res.status(200).send({msg : "task updated"})
-        
+      const { id } = req.params;
+      const { title, deadline } = req.body;
+  
+      // Prepare update data
+      const updateData = {};
+  
+      // If title is provided, encrypt it before updating
+      if (title) {
+        const iv = crypto.randomBytes(16); // Generate a random IV
+        const cipher = crypto.createCipheriv('aes-256-cbc', secretKey, iv);
+        let encryptedData = cipher.update(title, 'utf8', 'hex');
+        encryptedData += cipher.final('hex');
+  
+        // Store the encrypted title and IV
+        updateData.title = {
+          encryptedData,
+          iv: iv.toString('hex')
+        };
+      }
+  
+      // If deadline is provided, update it
+      if (deadline) {
+        updateData.deadline = deadline;
+      }
+  
+      // If neither title nor deadline are provided, return an error
+      if (Object.keys(updateData).length === 0) {
+        return res.status(400).send({ errors: [{ msg: "Either title or deadline must be provided" }] });
+      }
+  
+      // Update the task with the new data (title and/or deadline)
+      const updatedTask = await Task.findByIdAndUpdate(id, updateData, { new: true });
+  
+      // Send response with updated task
+      res.status(200).send({ msg: "Task updated", updatedTask });
     } catch (error) {
-        res.status(500).send({ errors: [{ msg: "Could not update task" }] })
+      console.error(error);
+      res.status(500).send({ errors: [{ msg: "Could not update task" }] });
     }
-
-}
+  };
 
 exports.deleteTask = async(req,res)=>{
 
