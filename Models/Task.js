@@ -2,8 +2,8 @@ const mongoose = require('mongoose');
 
 const taskSchema = new mongoose.Schema({
   title: {
-    type: String,
-    required: true,
+    encryptedData: { type: String, required: true }, // Encrypted title
+    iv: { type: String, required: true },           // Initialization vector
   },
   deadline: {
     type: Date,
@@ -15,7 +15,7 @@ const taskSchema = new mongoose.Schema({
   },
   Taskowner: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'UserModel', 
+    ref: 'UserModel',
     required: true,
   },
 });
