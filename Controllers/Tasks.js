@@ -4,47 +4,49 @@ const crypto = require('crypto');
 
 
 exports.updateTask = async (req, res) => {
-    try {
+  try {
       const { id } = req.params;
-      const { title, deadline } = req.body;
-  
-      
+      const { title, deadline, isDone } = req.body;
+
       const updateData = {};
-  
+
       
       if (title) {
-        const iv = crypto.randomBytes(16); 
-        const cipher = crypto.createCipheriv('aes-256-cbc', secretKey, iv);
-        let encryptedData = cipher.update(title, 'utf8', 'hex');
-        encryptedData += cipher.final('hex');
-  
-       
-        updateData.title = {
-          encryptedData,
-          iv: iv.toString('hex')
-        };
+          const iv = crypto.randomBytes(16); 
+          const cipher = crypto.createCipheriv('aes-256-cbc', secretKey, iv);
+          let encryptedData = cipher.update(title, 'utf8', 'hex');
+          encryptedData += cipher.final('hex');
+
+          updateData.title = {
+              encryptedData,
+              iv: iv.toString('hex')
+          };
       }
-  
+
       
       if (deadline) {
-        updateData.deadline = deadline;
+          updateData.deadline = deadline;
       }
-  
+
       
-      if (Object.keys(updateData).length === 0) {
-        return res.status(400).send({ errors: [{ msg: "Either title or deadline must be provided" }] });
+      if (typeof isDone === 'boolean') {
+          updateData.isDone = isDone;
       }
-  
+
+      
      
+
+      
       const updatedTask = await Task.findByIdAndUpdate(id, updateData, { new: true });
-  
-     
+
+      
       res.status(200).send({ msg: "Task updated", updatedTask });
-    } catch (error) {
+
+  } catch (error) {
       console.error(error);
       res.status(500).send({ errors: [{ msg: "Could not update task" }] });
-    }
-  };
+  }
+};
 
 exports.deleteTask = async(req,res)=>{
 
