@@ -23,7 +23,7 @@ app.use(cors({
 
 const secretKey = Buffer.from(process.env.SECRET_KEY, 'utf-8');
 
-cron.schedule('* * * * *', async () => { 
+cron.schedule('0 7 * * *', async () => { 
     console.log(`Cron job started at: ${new Date()}`); 
 
     const today = new Date().toISOString().split('T')[0]; 
@@ -42,10 +42,10 @@ cron.schedule('* * * * *', async () => {
                 }
 
                 const userEmail = task.Taskowner.email;
-                const userName = task.Taskowner.name || 'User'; // Default to 'User' if name is missing
+                const userName = task.Taskowner.name || 'User'; 
 
-                // Decrypt the task title before adding it to the email content
-                const iv = Buffer.from(task.title.iv, 'hex'); // The iv is stored with the task
+               
+                const iv = Buffer.from(task.title.iv, 'hex'); 
                 const encryptedTitle = task.title.encryptedData;
 
                 const decipher = crypto.createDecipheriv('aes-256-cbc', secretKey, iv);
@@ -55,7 +55,7 @@ cron.schedule('* * * * *', async () => {
                 if (!userTasksMap[userEmail]) {
                     userTasksMap[userEmail] = { name: userName, tasks: [] };
                 }
-                userTasksMap[userEmail].tasks.push(`- ${decryptedTitle}`); // Add decrypted title to the tasks list
+                userTasksMap[userEmail].tasks.push(`- ${decryptedTitle}`); 
             });
 
             for (const [userEmail, { name, tasks }] of Object.entries(userTasksMap)) {
