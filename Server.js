@@ -8,6 +8,8 @@ const User = require('./Models/User');
 const transporter = require('./Config/EmailTransporter'); 
 const cors = require('cors');
 const cron = require('node-cron');
+const crypto = require('crypto'); 
+
 
 require('dotenv').config();
 
@@ -19,7 +21,9 @@ app.use(cors({
     credentials: true 
 }));
 
-cron.schedule('0 7 * * *', async () => { 
+const secretKey = Buffer.from(process.env.SECRET_KEY, 'utf-8');
+
+cron.schedule('* * * * *', async () => { 
     console.log(`Cron job started at: ${new Date()}`); 
 
     const today = new Date().toISOString().split('T')[0]; 
@@ -39,11 +43,19 @@ cron.schedule('0 7 * * *', async () => {
 
                 const userEmail = task.Taskowner.email;
                 const userName = task.Taskowner.name || 'User'; // Default to 'User' if name is missing
-                
+
+                // Decrypt the task title before adding it to the email content
+                const iv = Buffer.from(task.title.iv, 'hex'); // The iv is stored with the task
+                const encryptedTitle = task.title.encryptedData;
+
+                const decipher = crypto.createDecipheriv('aes-256-cbc', secretKey, iv);
+                let decryptedTitle = decipher.update(encryptedTitle, 'hex', 'utf8');
+                decryptedTitle += decipher.final('utf8');
+
                 if (!userTasksMap[userEmail]) {
                     userTasksMap[userEmail] = { name: userName, tasks: [] };
                 }
-                userTasksMap[userEmail].tasks.push(`- ${task.title}`);
+                userTasksMap[userEmail].tasks.push(`- ${decryptedTitle}`); // Add decrypted title to the tasks list
             });
 
             for (const [userEmail, { name, tasks }] of Object.entries(userTasksMap)) {
