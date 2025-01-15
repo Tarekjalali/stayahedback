@@ -16,9 +16,9 @@ exports.createAccount =  async (req, res) => {
     const newAccount = new User(req.body);
 
     
-    const digits = "1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const digits = "1234567890";
     let activationCode = '';
-    for (let i = 0; i < 8; i++) {
+    for (let i = 0; i < 4; i++) {
       activationCode += digits.charAt(Math.floor(Math.random() * digits.length));
     }
 
